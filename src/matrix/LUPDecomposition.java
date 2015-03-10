@@ -73,7 +73,7 @@ public class LUPDecomposition {
                 }
             }
         }
-        
+        /*
          System.out.println("\nA:\n" + A + "\naPrime:\n" + aPrime + "\nL:\n" + L + "\nU:\n" + U + "\nP:\n" + P);
          try {
          System.out.println("Result of P.mult(A):\n" + P.mult(A));
@@ -81,7 +81,7 @@ public class LUPDecomposition {
          } catch (DimensionMismatchException ex) {
          ex.printStackTrace();
          System.exit(-1);//this really shouldn't happen so i'm going to bail here
-         }
+         }*/
         for (int i = 0; i < A.getRows(); ++i) {
             for (int j = 0; j < A.getColumns(); ++j) {
                 Upper.getMatrix()[i][j] = U.getMatrix()[i][j];

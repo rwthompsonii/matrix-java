@@ -5,6 +5,9 @@
  */
 package matrix;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author ron
@@ -90,16 +93,25 @@ public class MatrixTest {
         try {
             SquareMatrix InvertedTestSquare2 = SquareMatrix.invert(testSquare2);
             System.out.println("InvertedTestSquare2:\n" + InvertedTestSquare2);
-            System.out.println("Result of testSquare2.mult(InvertedTestSquare2): (should be identity matrix)\n" + testSquare2.mult(InvertedTestSquare2));        
-            System.out.println("Result of InvertedTestSquare2.mult(TestSquare2): (should be identity matrix)\n" + InvertedTestSquare2.mult(testSquare2));        
+            System.out.println("Result of testSquare2.mult(InvertedTestSquare2): (should be identity matrix)\n" + testSquare2.mult(InvertedTestSquare2));
+            System.out.println("Result of InvertedTestSquare2.mult(TestSquare2): (should be identity matrix)\n" + InvertedTestSquare2.mult(testSquare2));
         } catch (NonInvertibleMatrixException ex) {
             System.out.println("Inverting matrix testSquare2 threw exception:\n" + ex.getMessage());
         } catch (DimensionMismatchException ex) {
             System.out.println("Multiplying Matrix failed. (shouldn't have happened, exiting");
             System.exit(-1);
         }
-        
-        
+
+        SquareMatrix testSquare3 = new SquareMatrix(Matrix.transpose(testSquare2));
+
+        System.out.println("testSquare2:\n" + testSquare2 + "\ntestSquare3: (transpose of testSquare2)\n" + testSquare3);
+        try {
+            System.out.println("Result of testSquare2.subtract(testSquare3)\n" + testSquare2.subtract(testSquare3));
+        } catch (DimensionMismatchException ex) {
+            System.out.println("Subtracting Matrix failed. (shouldn't have happened, exiting");
+            System.exit(-1);
+        }
+
     }
 
 }
