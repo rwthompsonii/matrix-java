@@ -5,9 +5,6 @@
  */
 package matrix;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author ron
@@ -37,7 +34,7 @@ public class MatrixTest {
             {0, 0, 2}
         };
 
-        Matrix testMatrix4 = new Matrix(myArray, myArray.length, myArray[0].length);
+        Matrix testMatrix4 = new Matrix(myArray);
 
         System.out.println("My testMatrix4 :");
         System.out.println(testMatrix4);
@@ -48,7 +45,7 @@ public class MatrixTest {
             {7, 8, 11}
         };
 
-        Matrix testMatrix5 = new Matrix(mySecondArray, mySecondArray.length, mySecondArray[0].length);
+        Matrix testMatrix5 = new Matrix(mySecondArray);
 
         System.out.println("My testMatrix5 :");
         System.out.println(testMatrix5);
@@ -67,7 +64,8 @@ public class MatrixTest {
 
         SquareMatrix testSquare1 = new SquareMatrix(testMatrix5);
         try {
-            LUPDecomposition testDecompose = new LUPDecomposition(testSquare1);
+            LUPDecomposition testDecompose = new LUPDecomposition();
+            testDecompose.decompose(testSquare1);
         } catch (NonInvertibleMatrixException ex) {
             System.out.println("LUDecomposition of testDecompose object threw exception:\n" + ex.getMessage());
         }
@@ -79,17 +77,17 @@ public class MatrixTest {
             {8, 2, -7, 1}
         };
 
-        SquareMatrix testSquare2 = new SquareMatrix(new Matrix(myThirdArray, 4, 4));
+        SquareMatrix testSquare2 = new SquareMatrix(new Matrix(myThirdArray));
 
         try {
-            LUPDecomposition testDecompose2 = new LUPDecomposition(testSquare2);
-
+            LUPDecomposition testDecompose2 = new LUPDecomposition();
+            testDecompose2.decompose(testSquare2);
         } catch (NonInvertibleMatrixException ex) {
             System.out.println("LUDecomposition of testDecompose2 object threw exception:\n" + ex.getMessage());
         }
 
         System.out.println("Smoke test for testSquare2.determinant():\t" + testSquare2.determinant());
-        System.out.println("Second smoke test for testSquare1.determinant():\t" + testSquare1.determinant());
+        System.out.println("Second smoke test for testSquare1.determinant():\t" + testSquare1.determinant() + "\n");
         try {
             SquareMatrix InvertedTestSquare2 = SquareMatrix.invert(testSquare2);
             System.out.println("InvertedTestSquare2:\n" + InvertedTestSquare2);
@@ -112,6 +110,18 @@ public class MatrixTest {
             System.exit(-1);
         }
 
+        float[][] fail = {
+            {1, 2, 3},
+            {4, 5, 7},
+            {3, 6, 8},
+            {4, 5, 9}
+        };
+        
+        //Matrix goodMatrix = new Matrix(fail);
+        //SquareMatrix badMatrix = new SquareMatrix(goodMatrix);
+        //System.out.print(badMatrix);
     }
 
 }
+
+

@@ -39,59 +39,50 @@ public class Matrix implements MatrixConstants {
         this.columns = matrix.getColumns();
     }
 
-    public Matrix(double[][] matrix, int rows, int columns) {
-        assert (rows == matrix.length);
-        assert (columns == matrix[0].length);
+    public Matrix(double[][] matrix) {
 
         this.matrix = matrix;
-        this.rows = rows;
-        this.columns = columns;
+        this.rows = matrix.length;
+        this.columns = matrix[0].length;
     }
 
     /**
      * a convenience constructor provided for integer[][] inputs
      *
      * @param matrix
-     * @param rows
-     * @param columns
      */
-    public Matrix(int[][] matrix, int rows, int columns) {
-        assert (rows == matrix.length);
-        assert (columns == matrix[0].length);
+    public Matrix(int[][] matrix) {
+
+        this.rows = matrix.length;
+        this.columns = matrix[0].length;
 
         double[][] convertedMatrix = new double[rows][columns];
+
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
                 convertedMatrix[i][j] = (double) matrix[i][j];
             }
         }
-
         this.matrix = convertedMatrix;
-        this.rows = rows;
-        this.columns = columns;
     }
 
     /**
      * A convenience constructor provided for float[][] inputs
      *
      * @param matrix
-     * @param rows
-     * @param columns
      */
-    public Matrix(float[][] matrix, int rows, int columns) {
-        assert (rows == matrix.length);
-        assert (columns == matrix[0].length);
+    public Matrix(float[][] matrix) {
+        this.rows = matrix.length;
+        this.columns = matrix[0].length;
 
         double[][] convertedMatrix = new double[rows][columns];
+
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
                 convertedMatrix[i][j] = (double) matrix[i][j];
             }
         }
-
         this.matrix = convertedMatrix;
-        this.rows = rows;
-        this.columns = columns;
     }
 
     public static Matrix IdentityMatrix(int size) {
@@ -110,12 +101,12 @@ public class Matrix implements MatrixConstants {
             }
         }
 
-        Matrix Identity = new Matrix(identity, size, size);
+        Matrix Identity = new Matrix(identity);
 
         return Identity;
     }
 
-    //note that equals does NOT compare with equality operator, it uses EPSILON for "close enough"
+    //note that equals does NOT compare with equality operator, it uses MatrixConstants.EPSILON for "close enough"
     public boolean equals(Matrix other) {
         if (other.getClass() != getClass() || other.getColumns() != getColumns() || other.getRows() != getRows()) {
             return false;
@@ -123,7 +114,7 @@ public class Matrix implements MatrixConstants {
             double[][] otherMatrix = other.getMatrix();
             for (int i = 0; i < rows; ++i) {
                 for (int j = 0; j < columns; ++j) {
-                    if (Math.abs(otherMatrix[i][j] - matrix[i][j]) < EPSILON) {
+                    if (Math.abs(otherMatrix[i][j] - matrix[i][j]) > EPSILON) {
                         return false;
                     }
                 }
@@ -165,6 +156,28 @@ public class Matrix implements MatrixConstants {
         return result.toString();
     }
 
+    /**
+     * function mult() is a convenience wrapper method used when you don't want
+     * to create matrices to multiply two multidimensional arrays. the objects
+     * are internally created to carry out the multiplication, though, so it's
+     * just a wrapper in the true sense of the word
+     *
+     * @param a - the left side operand of the matrix multiplication operation -
+     * note matrix multiplication does not normally commute => in general => a*b
+     * != b*a -- you were warned
+     * @param b - the right side operand of the matrix multiplication operation
+     * @return - a double[a.rows][b.columns] result array of the results of the
+     * multiplication
+     * @throws DimensionMismatchException - note that a.columns != b.rows will
+     * result in this exception being thrown
+     */
+    public static double[][] mult(double[][] a, double[][] b) throws DimensionMismatchException {
+        Matrix A = new Matrix(a);
+        Matrix B = new Matrix(b);
+
+        return Matrix.mult(A, B).getMatrix();
+    }
+
     public static Matrix mult(Matrix A, Matrix B) throws DimensionMismatchException {
         //you can think of this operation as A * B where A,B are matrices
         //remember that Matrix multiplication normally does NOT commute
@@ -182,7 +195,8 @@ public class Matrix implements MatrixConstants {
         double[][] a = A.getMatrix();
         double[][] b = B.getMatrix();
 
-        //iterate over the resulting array filling in the values from the two operands according to matrix mult rules
+        //iterate over the resulting array filling in the values 
+        //from the two operands according to matrix mult rules
         for (int i = 0; i < aRows; ++i) {
             for (int j = 0; j < bCols; ++j) {
                 for (int k = 0; k < aCols/*could also use bRows here*/; ++k) {
@@ -191,77 +205,71 @@ public class Matrix implements MatrixConstants {
             }
         }
 
-        Matrix Result = new Matrix(result, A.getRows(), B.getColumns());
-
-        return Result;
+        return new Matrix(result);
     }
-    
+
     public static Matrix transpose(Matrix A) {
         double[][] result = new double[A.getColumns()][A.getRows()];
-        
+
         double[][] a = A.getMatrix();
-        
-        for(int i = 0; i < A.getRows(); ++i){
-            for(int j = 0; j < A.getColumns(); ++j){
+
+        for (int i = 0; i < A.getRows(); ++i) {
+            for (int j = 0; j < A.getColumns(); ++j) {
                 result[i][j] = a[j][i];
             }
         }
-  
-        Matrix Result = new Matrix(result, A.getColumns(), A.getRows());
-        
-        return Result;
+
+        return new Matrix(result);
     }
-    
+
     public Matrix transpose() {
         return transpose(this);
     }
-    
+
     public static Matrix scale(Matrix A, double v) {
-    
-        double[][] a = A.getMatrix().clone();
-        
-        for(int i = 0; i < A.getRows(); ++i) {
-            for(int j = 0; j < A.getColumns(); ++j) {
+
+        double[][] a = A.getMatrix().clone(); //using clone to avoid modifying A
+
+        for (int i = 0; i < A.getRows(); ++i) {
+            for (int j = 0; j < A.getColumns(); ++j) {
                 a[i][j] *= v;
             }
         }
-        
-        Matrix Result = new Matrix(a, A.getRows(), A.getColumns());
-    
+
+        Matrix Result = new Matrix(a);
+
         return Result;
     }
-    
+
     public Matrix scale(double v) {
         return scale(this, v);
     }
-    
+
     public static Matrix add(Matrix A, Matrix B) throws DimensionMismatchException {
-        if(A.getRows() != B.getRows() || A.getColumns() != B.getColumns()) {
+        if (A.getRows() != B.getRows() || A.getColumns() != B.getColumns()) {
             throw new DimensionMismatchException("This operation can only be performed on matrices of equal dimensions.");
         }
-        
-        double[][] result = A.getMatrix().clone();
-        
-        for(int i = 0; i < A.getRows(); ++i) {
-            for(int j = 0; j < A.getColumns(); ++j) {
+
+        double[][] result = A.getMatrix().clone(); //using clone to avoid modifying A
+
+        for (int i = 0; i < A.getRows(); ++i) {
+            for (int j = 0; j < A.getColumns(); ++j) {
                 result[i][j] = A.getMatrix()[i][j] + B.getMatrix()[i][j];
             }
         }
         
-        Matrix Result = new Matrix(result, A.getRows(), A.getColumns());
-        
-        return Result;
+        return new Matrix(result);
     }
-    
+
     public Matrix add(Matrix B) throws DimensionMismatchException {
         return add(this, B);
     }
-    
+
     public static Matrix subtract(Matrix A, Matrix B) throws DimensionMismatchException {
         Matrix C = scale(B, -1);
         return add(A, C);
     }
-    
+
     public Matrix subtract(Matrix B) throws DimensionMismatchException {
         return subtract(this, B);
     }
@@ -278,6 +286,6 @@ public class Matrix implements MatrixConstants {
                 zeroMatrix[i][j] = 0;
             }
         }
-        return new Matrix(zeroMatrix, rows, columns);
+        return new Matrix(zeroMatrix);
     }
 }

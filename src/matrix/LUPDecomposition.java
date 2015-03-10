@@ -11,32 +11,22 @@ package matrix;
  */
 public class LUPDecomposition {
 
-    public static SquareMatrix U;
-    public static SquareMatrix L;
-    public static SquareMatrix P;
-    public static int permutations;
+    public SquareMatrix U;
+    public SquareMatrix L;
+    public SquareMatrix P;
+    public int permutations;
 
-    public LUPDecomposition(SquareMatrix A) throws NonInvertibleMatrixException {
-        U = new SquareMatrix(Matrix.zeroes(A.getRows(), A.getColumns()));
-        L = new SquareMatrix(Matrix.zeroes(A.getRows(), A.getColumns()));
-        P = new SquareMatrix(Matrix.zeroes(A.getRows(), A.getColumns()));
-        decompose(A, U, L, P);
+    public LUPDecomposition() {
     }
 
     /**
      *
-     * @param A - input SquareMatrix to be decomposed
-     * @param Upper - output Upper triangular SquareMatrix, already existing
-     * with the appropriate size
-     * @param Lower - output (unit) Lower triangular SquareMatrix, already
-     * existing with the appropriate size
-     * @param Perm - output Permutation SquareMatrix, already existing with the
-     * appropriate size
+     * @param A - the input Matrix
      * @return returns number of permutations, useful for calculating
      * determinants. ignore it if you don't need it
      * @throws matrix.NonInvertibleMatrixException
      */
-    public static int decompose(SquareMatrix A, SquareMatrix Upper, SquareMatrix Lower, SquareMatrix Perm) throws NonInvertibleMatrixException {
+    public int decompose(SquareMatrix A) throws NonInvertibleMatrixException {
         U = new SquareMatrix(Matrix.zeroes(A.getRows(), A.getColumns()));
         L = new SquareMatrix(Matrix.IdentityMatrix(A.getRows()));
         SquareMatrix aPrime = null;
@@ -58,7 +48,9 @@ public class LUPDecomposition {
                     U.getMatrix()[j][i] = aPrime.getMatrix()[j][i] - s;
                     if (i == j) {
                         if (Math.abs(U.getMatrix()[j][i]) <= 0.000001) {
-                            L = null; U = null; P = null;//cleaning these up so they don't get used
+                            L = null;
+                            U = null;
+                            P = null;//cleaning these up so they don't get used
                             throw new NonInvertibleMatrixException("Matrix cannot be decomposed, it is singular.");
                         }
                     }
@@ -82,17 +74,36 @@ public class LUPDecomposition {
          ex.printStackTrace();
          System.exit(-1);//this really shouldn't happen so i'm going to bail here
          }*/
-        for (int i = 0; i < A.getRows(); ++i) {
-            for (int j = 0; j < A.getColumns(); ++j) {
-                Upper.getMatrix()[i][j] = U.getMatrix()[i][j];
-                Lower.getMatrix()[i][j] = L.getMatrix()[i][j];
-                Perm.getMatrix()[i][j] = P.getMatrix()[i][j];
-            }
-        }
+
         return permutations;
     }
+    
+    /**
+     *
+     * @param a - the matrix to be decomposed, note that if it is not square an error will occur, calling code must verify this.  
+     * if 'a' is not invertible an exception will be thrown
+     * @param l - output l matrix, lower unit triangular
+     * @param u - output u matrix, upper triangular
+     * @param p - output permutation matrix
+     * @return - number of row permutations in p matrix from identity matrix, useful for calculating determinants
+     * @throws NonInvertibleMatrixException
+     */
+    public static int decompose (double[][] a, double[][] l, double[][] u, double[][] p) throws NonInvertibleMatrixException {
+        LUPDecomposition LUP = new LUPDecomposition();
+        SquareMatrix A = new SquareMatrix(a);
+        
+        int result =  LUP.decompose(A);
+        
+        l = LUP.L.getMatrix();
+        u = LUP.U.getMatrix();
+        p = LUP.P.getMatrix();
+        
+        return result;
+    }
 
-    public static void pivot(SquareMatrix A) {
+    //helper function for decompose
+
+    private void pivot(SquareMatrix A) {
         permutations = 0;
         P = new SquareMatrix(Matrix.IdentityMatrix(A.getRows()));
 
@@ -115,6 +126,5 @@ public class LUPDecomposition {
                 permutations++;
             }
         }
-
     }
 }
