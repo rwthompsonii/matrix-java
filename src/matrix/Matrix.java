@@ -9,7 +9,7 @@ package matrix;
  *
  * @author ron
  */
-public class Matrix {
+public class Matrix implements MatrixConstants {
 
     protected int rows;
     protected int columns;
@@ -28,9 +28,9 @@ public class Matrix {
     }
 
     public Matrix() {
-        this.matrix = IdentityMatrix(2).getMatrix();
-        this.rows = 2;
-        this.columns = 2;
+        this.matrix = IdentityMatrix(DEFAULT_SIZE).getMatrix();
+        this.rows = DEFAULT_SIZE;
+        this.columns = DEFAULT_SIZE;
     }
 
     public Matrix(Matrix matrix) {
@@ -115,6 +115,7 @@ public class Matrix {
         return Identity;
     }
 
+    //note that equals does NOT compare with equality operator, it uses EPSILON for "close enough"
     public boolean equals(Matrix other) {
         if (other.getClass() != getClass() || other.getColumns() != getColumns() || other.getRows() != getRows()) {
             return false;
@@ -122,7 +123,7 @@ public class Matrix {
             double[][] otherMatrix = other.getMatrix();
             for (int i = 0; i < rows; ++i) {
                 for (int j = 0; j < columns; ++j) {
-                    if (otherMatrix[i][j] != matrix[i][j]) {
+                    if (Math.abs(otherMatrix[i][j] - matrix[i][j]) < EPSILON) {
                         return false;
                     }
                 }
@@ -131,12 +132,30 @@ public class Matrix {
         return true;
     }
 
+    //this method is useful if you want to see the nasty decimals the default
+    //toString() method hides
+    public String rawToString() {
+        StringBuilder result = new StringBuilder(rows * columns * 3);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                result.append(matrix[i][j]);
+                if (j < columns - 1) {
+                    result.append(",\t");
+                }
+            }
+            result.append(";\n");
+        }
+        return result.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(rows * columns * 3);
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
-                result.append(matrix[i][j]);
+                //ugly floating point hack incoming to prevent 1.00000000004 and 8E-16 
+                // and the like from crapping all over my pretty matrices
+                result.append(Math.floor((matrix[i][j]) * 1000000000 + 0.5) / 1000000000);
                 if (j < columns - 1) {
                     result.append(",\t");
                 }
@@ -169,21 +188,82 @@ public class Matrix {
                 for (int k = 0; k < aCols/*could also use bRows here*/; ++k) {
                     result[i][j] += a[i][k] * b[k][j];
                 }
-                /*if (Math.abs(result[i][j]) < 0.00000001) {
-                 result[i][j] = 0.0; //ugly hack to get around floating point operations having limited precision
-                 }*/
-                result[i][j] = Math.floor((result[i][j] * 1000000000 + 0.5) / 1000000000);
-                //slightly uglier hack than works on all of the numbers
-                // though I'm giving up some precision (anything beyond 9 digits is lost)
-                //it keeps me from printing crap like 1.0000000000000000004 on the screen, though
-                //and that's not real anyway because that's just the limitation 
-                //of the hardware expressing decimal numbers as binary
             }
         }
 
         Matrix Result = new Matrix(result, A.getRows(), B.getColumns());
 
         return Result;
+    }
+    
+    public static Matrix transpose(Matrix A) {
+        double[][] result = new double[A.getColumns()][A.getRows()];
+        
+        double[][] a = A.getMatrix();
+        
+        for(int i = 0; i < A.getRows(); ++i){
+            for(int j = 0; j < A.getColumns(); ++j){
+                result[i][j] = a[j][i];
+            }
+        }
+  
+        Matrix Result = new Matrix(result, A.getColumns(), A.getRows());
+        
+        return Result;
+    }
+    
+    public Matrix transpose() {
+        return transpose(this);
+    }
+    
+    public static Matrix scale(Matrix A, double v) {
+    
+        double[][] a = A.getMatrix().clone();
+        
+        for(int i = 0; i < A.getRows(); ++i) {
+            for(int j = 0; j < A.getColumns(); ++j) {
+                a[i][j] *= v;
+            }
+        }
+        
+        Matrix Result = new Matrix(a, A.getRows(), A.getColumns());
+    
+        return Result;
+    }
+    
+    public Matrix scale(double v) {
+        return scale(this, v);
+    }
+    
+    public static Matrix add(Matrix A, Matrix B) throws DimensionMismatchException {
+        if(A.getRows() != B.getRows() || A.getColumns() != B.getColumns()) {
+            throw new DimensionMismatchException("This operation can only be performed on matrices of equal dimensions.");
+        }
+        
+        double[][] result = A.getMatrix().clone();
+        
+        for(int i = 0; i < A.getRows(); ++i) {
+            for(int j = 0; j < A.getColumns(); ++j) {
+                result[i][j] = A.getMatrix()[i][j] + B.getMatrix()[i][j];
+            }
+        }
+        
+        Matrix Result = new Matrix(result, A.getRows(), A.getColumns());
+        
+        return Result;
+    }
+    
+    public Matrix add(Matrix B) throws DimensionMismatchException {
+        return add(this, B);
+    }
+    
+    public static Matrix subtract(Matrix A, Matrix B) throws DimensionMismatchException {
+        Matrix C = scale(B, -1);
+        return add(A, C);
+    }
+    
+    public Matrix subtract(Matrix B) throws DimensionMismatchException {
+        return subtract(this, B);
     }
 
     public Matrix mult(Matrix B) throws DimensionMismatchException {
