@@ -158,9 +158,10 @@ public class Matrix implements MatrixConstants {
 
     /**
      * function mult() is a convenience wrapper method used when you don't want
-     * to create matrices to multiply two multidimensional arrays. the objects
-     * are internally created to carry out the multiplication, though, so it's
-     * just a wrapper in the true sense of the word
+     * to create Matrix objects yourself to multiply two multidimensional
+     * arrays. the objects are internally created to carry out the
+     * multiplication, though, so it's just a wrapper in the true sense of the
+     * word
      *
      * @param a - the left side operand of the matrix multiplication operation -
      * note matrix multiplication does not normally commute => in general => a*b
@@ -176,6 +177,10 @@ public class Matrix implements MatrixConstants {
         Matrix B = new Matrix(b);
 
         return Matrix.mult(A, B).getMatrix();
+    }
+    
+    public Matrix mult(Matrix B) throws DimensionMismatchException {
+        return mult(this, B);
     }
 
     public static Matrix mult(Matrix A, Matrix B) throws DimensionMismatchException {
@@ -236,9 +241,7 @@ public class Matrix implements MatrixConstants {
             }
         }
 
-        Matrix Result = new Matrix(a);
-
-        return Result;
+        return new Matrix(a);
     }
 
     public Matrix scale(double v) {
@@ -257,7 +260,7 @@ public class Matrix implements MatrixConstants {
                 result[i][j] = A.getMatrix()[i][j] + B.getMatrix()[i][j];
             }
         }
-        
+
         return new Matrix(result);
     }
 
@@ -274,10 +277,6 @@ public class Matrix implements MatrixConstants {
         return subtract(this, B);
     }
 
-    public Matrix mult(Matrix B) throws DimensionMismatchException {
-        return mult(this, B);
-    }
-
     public static Matrix zeroes(int rows, int columns) {
         double[][] zeroMatrix = new double[rows][columns];
 
@@ -288,4 +287,16 @@ public class Matrix implements MatrixConstants {
         }
         return new Matrix(zeroMatrix);
     }
+    
+    public static Matrix random (int rows, int columns, double max, double min) {
+        double[][] randomMatrix = new double[rows][columns];
+        
+        for(int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                randomMatrix[i][j] =  (Math.random() * (max - min) + min);
+            }
+        }
+        
+        return new Matrix(randomMatrix);
+    } 
 }

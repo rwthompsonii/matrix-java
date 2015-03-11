@@ -5,6 +5,8 @@
  */
 package matrix;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author ron
@@ -64,15 +66,15 @@ public class SquareMatrix extends Matrix {
      * returned
      * @return
      */
-    public static double determinant(SquareMatrix A) {
+    public static BigDecimal determinant(SquareMatrix A) {
         try {
             LUP = new LUPDecomposition();
             LUP.decompose(A);
         } catch (NonInvertibleMatrixException ex) {
             LUP = null;
-            return 0;
+            return new BigDecimal(0.0);
         }
-        double det = 1;
+        BigDecimal det = new BigDecimal(1);
         double[][] u = LUP.U.getMatrix();
         /*
          System.out.println("\nA:\n" + A + "\nL:\n" + L + "\nU:\n" + U + "\nP:\n" + P + "\nperms:\n" + perms);
@@ -88,11 +90,11 @@ public class SquareMatrix extends Matrix {
         //L matrix is not used because it is a unit lower triangular matrix, 
         //and its main diagonal entries are all 1
         for (int i = 0; i < LUP.U.getRows(); ++i) {
-            det *= u[i][i];
+            det = det.multiply(new BigDecimal(u[i][i]));
         }
 
         if (LUP.permutations % 2 != 0) {
-            det *= -1;
+            det = det.multiply(new BigDecimal(-1));
         }
 
         return det;
@@ -102,13 +104,13 @@ public class SquareMatrix extends Matrix {
      *
      * @return Determinant of matrix in class
      */
-    public double determinant() {
+    public BigDecimal determinant() {
         return determinant(this);
     }
 
     public static SquareMatrix invert(SquareMatrix A) throws NonInvertibleMatrixException {
-        double detA = determinant(A);
-        if (0 == detA) {
+        BigDecimal detA = determinant(A);
+        if (detA == new BigDecimal(0)) {
             throw new NonInvertibleMatrixException("Cannot invert matrix, determinant is 0.");
         }
         int n = A.getRows();
