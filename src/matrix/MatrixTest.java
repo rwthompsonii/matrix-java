@@ -165,8 +165,6 @@ public class MatrixTest {
         QRDecomposition qr = new QRDecomposition();
 
         qr.decompose(QRTest);
-
-        System.out.println("QRtest:\n" + QRTest + "Q:\n" + qr.Q + "R:\n" + qr.R);
         
         System.out.println("\nQ:\n" + qr.Q + "\nR:\n" + qr.R + "\nQRtest: (original matrix)\n" + QRTest);
         
