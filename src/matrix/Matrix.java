@@ -264,7 +264,7 @@ public class Matrix implements MatrixConstants {
             throw new DimensionMismatchException("This operation can only be performed on matrices of equal dimensions.");
         }
 
-        double[][] result = A.getMatrix().clone(); //using clone to avoid modifying A
+        double[][] result = new double[A.getRows()][A.getColumns()]; 
 
         for (int i = 0; i < A.getRows(); ++i) {
             for (int j = 0; j < A.getColumns(); ++j) {

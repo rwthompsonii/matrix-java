@@ -152,32 +152,39 @@ public class MatrixTest {
         System.out.println("Result of big3.determinant():\t" + big3.determinant() + "\n");
 
         double[][] qrTest = {
-            {12, -51, 4},
-            {6, 167, -68},
-            {-4, 24, -41},
-            {-1, 1, 0},
-            {2, 0, 3}};
-        
+            {4, 2, 2, 2},
+            {2, -3, 1, 1},
+            {2, 1, 3, 1},
+            {3, 1, 1, 2}};
+
         Matrix QRTest = new Matrix(qrTest);
-        
+
         QRDecomposition qr = new QRDecomposition();
-        
+
         qr.decompose(QRTest);
-        
+
         System.out.println("QRtest:\n" + QRTest + "Q:\n" + qr.Q + "R:\n" + qr.R);
-        
+
         try {
             System.out.println("Result of Q.mult(R): (should be the original matrix)\n" + qr.Q.mult(qr.R));
         } catch (DimensionMismatchException ex) {
             System.out.println("this exception shouldn't have happened, bailing");
             System.exit(-1);
         }
-        
+
         try {
             System.out.println("Result of Q.mult(Q.transpose()): (should be the identity matrix)\n" + qr.Q.mult(qr.Q.transpose()));
         } catch (DimensionMismatchException ex) {
             System.out.println("this exception shouldn't have happened, bailing");
             System.exit(-1);
+        }
+
+        System.out.println("Beginning initial testing of eigenvalue function on QRTest:\n" + QRTest);
+
+        double[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
+        
+        for (double e : eigen) {
+            System.out.println("eigenvalue:" + e);
         }
     }
 

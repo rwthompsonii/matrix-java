@@ -25,6 +25,7 @@ public class QRDecomposition {
 
     public Matrix Q;
     public Matrix R;
+    public int iterations;
 
     public QRDecomposition() {
 
