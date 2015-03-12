@@ -151,6 +151,9 @@ public class MatrixTest {
         System.out.println("smoke checking determinant method with " + BMFsize + "x" + BMFsize + " matrix.\n");
         System.out.println("Result of big3.determinant():\t" + big3.determinant() + "\n");
 
+        
+        System.out.println("Performing basic check of QR Decomp with known 3x5 matrix.\n");
+        
         double[][] qrTest = {
             {4, 2, 2, 2},
             {2, -3, 1, 1},
@@ -164,7 +167,9 @@ public class MatrixTest {
         qr.decompose(QRTest);
 
         System.out.println("QRtest:\n" + QRTest + "Q:\n" + qr.Q + "R:\n" + qr.R);
-
+        
+        System.out.println("\nQ:\n" + qr.Q + "\nR:\n" + qr.R + "\nQRtest: (original matrix)\n" + QRTest);
+        
         try {
             System.out.println("Result of Q.mult(R): (should be the original matrix)\n" + qr.Q.mult(qr.R));
         } catch (DimensionMismatchException ex) {
