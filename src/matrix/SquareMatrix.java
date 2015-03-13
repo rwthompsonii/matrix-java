@@ -17,6 +17,7 @@
 package matrix;
 
 import java.math.BigDecimal;
+import org.apache.commons.math3.complex.Complex;
 
 /**
  *
@@ -167,20 +168,29 @@ public class SquareMatrix extends Matrix {
         return result;
     }
 
-    public double[] eigenvalues() {
+    public Complex[] eigenvalues() {
         return eigenvalues(this);
     }
 
-    public static double[] eigenvalues(SquareMatrix A) {
-        double[] e = new double[A.getRows()];
+    public static Complex[] eigenvalues(SquareMatrix A) {
+        Complex[] e = new Complex[A.getRows()];
 
         QRDecomposition qr = new QRDecomposition();
         qr.iterations = 0;
         int num_eigen_found = 0;
         SquareMatrix QRIterator = A;
-
+        int max = MAX_ITERATIONS;
         do {
-            qr.decompose(QRIterator);
+            //System.out.println(qr.iterations);
+            if (QRIterator.getRows() == 1) {
+                //very last 1x1 element in matrix
+                e[num_eigen_found++] = new Complex(
+                        QRIterator.getMatrix()[0][0]
+                );
+                break;
+            } else {
+            qr.decompose(QRIterator); 
+            }
             try {
                 QRIterator = new SquareMatrix(qr.R.mult(qr.Q));
 
@@ -189,47 +199,94 @@ public class SquareMatrix extends Matrix {
                 System.exit(-1);
             }
             qr.iterations++;
-            
-            
+
             //testing indicates that MAX_ITERATIONS iterations should be more than sufficient to converge, if its going to at all
-            if(qr.iterations >= MAX_ITERATIONS) {
-                if(Math.abs(QRIterator.getMatrix()[QRIterator.getRows()-1][QRIterator.getColumns()-2]) < CONVERGENCE_CHECK) {
-                    //then the value at M[n][n] is an eigenvalue
-                    e[num_eigen_found] = QRIterator.getMatrix()[QRIterator.getRows()-1][QRIterator.getRows()-1];
+            if (qr.iterations == max) {
+                if (Math.abs(QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 2]) < CONVERGENCE_CHECK) {
+                    //then the value at M[n][n] is an eigenvalue and it is real
+                    e[num_eigen_found] = new Complex(
+                            QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 1]
+                    );
                     num_eigen_found++;
-                    
-                    double[][] deflatedMatrix = deflate(A.getMatrix(), 1);
-                    SquareMatrix Deflated = new SquareMatrix(deflatedMatrix);
-                    double[] temp = eigenvalues(Deflated);
-                    for(int i = num_eigen_found; i < e.length; ++i) {
-                        e[i] = temp[i-1];
-                        num_eigen_found++;
-                        //System.out.println("i:" + i + "e[i]" + e[i]);
+
+                    //System.out.println("e[" + (num_eigen_found - 1) + "]:\t" + e[num_eigen_found - 1] + "\nQRIterator before deflation:\n" + QRIterator);
+                    double[][] deflatedMatrix = deflate(QRIterator.getMatrix(), 1);
+                    QRIterator = new SquareMatrix(deflatedMatrix);
+
+                    //System.out.println("\nQRIterator after deflation:\n" + QRIterator);
+                    if (2 < QRIterator.getRows()) {
+                        max += MAX_ITERATIONS;  //reset the max to find the next eigenvalue
+                    } else {
+                        if (QRIterator.getRows() == 2) {
+                            //i'm on the last 2x2 set and it's converged, so i'm going to pull the eigenvalues off the diagonal
+                            e[num_eigen_found++] = new Complex(
+                                    QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 1]
+                            );
+                            e[num_eigen_found++] = new Complex(
+                                    QRIterator.getMatrix()[QRIterator.getRows() - 2][QRIterator.getColumns() - 2]
+                            );
+
+                        }
+
+                        break;
                     }
-                    return e;
-                }
-                else {
+                } else {
                     //this is a 2x2 matrix with either real or complex roots.  need to find them.
+                    //characteristic equation of 2x2 array => E^2 - (w + z)E + (wz - xy) = 0 where E = eigenvalue (possibly pair, possibly singular, possibly real, possibly complex)
+                    // and the matrix {{w, x}, {y, z}} is the input array, the task is to calculate the root(s) of that equation
+                    //that is a quadratic equation => (root = (-b +- sqrt(b^2  - 4ac))/2a)
+                    //determinant b^2 - 4ac will determine behavior of roots => positive means 2 real roots, 0 means 1 repeated real root, negative means conjugate pair of imaginary roots
+
+                    //first, get the wxyz from the (possibly bigger) matrix
+                    int n = QRIterator.getRows();
+                    double w = QRIterator.getMatrix()[n - 2][n - 2];
+                    double x = QRIterator.getMatrix()[n - 2][n - 1];
+                    double y = QRIterator.getMatrix()[n - 1][n - 2];
+                    double z = QRIterator.getMatrix()[n - 1][n - 1];
+
+                    //a not used since it's = 1
+                    double b = -(w + z);
+                    double c = (w * z - x * y);
+
+                    //calculate determinant of quadratic equation
+                    double determ = b * b - 4 * c;
+
+                    if (determ >= 0) {
+                        //one or two real roots 
+                        double sqrt_determ_real = Math.sqrt(determ);
+                        e[num_eigen_found++] = new Complex((-b + sqrt_determ_real) / 2.0);
+                        e[num_eigen_found++] = new Complex((-b - sqrt_determ_real) / 2.0);
+                        //in the zero determinant case that's simply going to add the same eigenvalue to the list twice.  I'm ok with that for now.
+                    } else if (determ < 0) {
+                        //conjugate pair of complex roots
+                        double sqrt_determ_imag = Math.sqrt(-determ);
+                        e[num_eigen_found] = new Complex(-b / 2.0, sqrt_determ_imag / 2.0);
+                        num_eigen_found++;
+                        e[num_eigen_found] = new Complex(-b / 2.0, -sqrt_determ_imag / 2.0);
+                        num_eigen_found++;
+                    }
+
+                    if (QRIterator.getRows() > 2) {
+                        max += MAX_ITERATIONS;  //reset the max to find the next eigenvalue
+                        double[][] deflatedMatrix = deflate(QRIterator.getMatrix(), 2);
+                        QRIterator = new SquareMatrix(deflatedMatrix);
+                    } else {
+                        break;
+                    }
+
                 }
             }
-            
-        } while (hasConverged(QRIterator) == false && qr.iterations < MAX_ITERATIONS);
+        } while (qr.iterations < max);
 
-        if (hasConverged(QRIterator)) {
-            for (int i = 0; i < e.length; ++i) {
-                e[i] = QRIterator.getMatrix()[i][i];
-            }
-        }
         //used for debugging here
-        System.out.println("Finished iterating.  Iterations:\t" + qr.iterations
-                + "\nFinal value of qr.Q:\n" + qr.Q + "\nFinal value of qr.R:\n" + qr.R
-                + "\nFinal value of QRIterator:\n" + QRIterator
-                + "\nOriginal SquareMatrix A:\n" + A);
-
+        /*System.out.println("Finished iterating.  Iterations:\t" + qr.iterations
+         + "\nFinal value of qr.Q:\n" + qr.Q + "\nFinal value of qr.R:\n" + qr.R
+         + "\nFinal value of QRIterator:\n" + QRIterator
+         + "\nOriginal SquareMatrix A:\n" + A);
+         */
         return e;
-    }
+    } //internal helper method called from eigenvalues function 
 
-    //internal helper method called from eigenvalues function 
     private static boolean hasConverged(SquareMatrix A) {
         double[][] a = A.getMatrix().clone();//do not want to modify it here
 
@@ -242,10 +299,10 @@ public class SquareMatrix extends Matrix {
         }
         return true;
     }
-    
-    private static double[][] deflate (double[][] matrix, int numToDelete) {
-        double[][] deflated = new double[matrix.length-numToDelete][matrix[0].length-numToDelete];
-        
+
+    private static double[][] deflate(double[][] matrix, int numToDelete) {
+        double[][] deflated = new double[matrix.length - numToDelete][matrix[0].length - numToDelete];
+
         for (int i = 0; i < deflated.length; ++i) {
             for (int j = 0; j < deflated[0].length; ++j) {
                 deflated[i][j] = matrix[i][j];

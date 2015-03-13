@@ -157,10 +157,10 @@ public class MatrixTest {
         System.out.println("Performing basic check of QR Decomp with known 3x5 matrix.\n");
         
         double[][] qrTest = {
-            {3, 2, 2, 1},
-            {-2, 3, 1, 1},
-            {2, 1, 2, 1},
-            {1, 1, 1, -1}};
+            {4, 8, 9, 1},
+            {2, -3, 1, -1},
+            {8, 15, 3, 1},
+            {7, 1, 2, 3}};
 
         Matrix QRTest = new Matrix(qrTest);
 
@@ -186,11 +186,23 @@ public class MatrixTest {
 
         System.out.println("Beginning initial testing of eigenvalue function on QRTest:\n" + QRTest);
 
-        double[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
-        Complex eigen2 = new Complex(1, 1);//just making sure the library works
-        for (double e : eigen) {
+        Complex[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
+        
+        for (Complex e : eigen) {
             System.out.println("eigenvalue:" + e);
         }
+        
+        int SMFSize = 4;
+        SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
+        
+        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n");
+        eigen = big3.eigenvalues();
+        
+        for (Complex e : eigen) {
+            System.out.println("eigenvalue:" + e);
+        }
+        
+        
     }
 
 }
