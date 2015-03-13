@@ -195,8 +195,8 @@ public class MatrixTest {
         int SMFSize = 4;
         SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
         
-        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n");
-        eigen = big3.eigenvalues();
+        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4.toCopyableString());
+        eigen = big4.eigenvalues();
         
         for (Complex e : eigen) {
             System.out.println("eigenvalue:" + e);

@@ -16,6 +16,8 @@
  */
 package matrix;
 
+import org.apache.commons.math3.util.Precision;
+
 /**
  *
  * @author ron
@@ -164,6 +166,26 @@ public class Matrix implements MatrixConstants {
             }
             result.append(";\n");
         }
+        return result.toString();
+    }
+    
+    public String toCopyableString() {
+        StringBuilder result = new StringBuilder(rows * columns * 3);
+        result.append("{");
+        for (int i = 0; i < rows; ++i) {
+            result.append("{");
+            for (int j = 0; j < columns; ++j) {
+                result.append(Precision.round(matrix[i][j], 3));
+                if(j < columns-1) {
+                    result.append(",");
+                }
+            }
+            result.append("}");
+            if(i < rows-1) {
+                result.append(",");
+            }
+        }
+        result.append("}");
         return result.toString();
     }
 
