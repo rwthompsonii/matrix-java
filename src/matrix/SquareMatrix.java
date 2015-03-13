@@ -18,7 +18,6 @@ package matrix;
 
 import java.math.BigDecimal;
 
-
 /**
  *
  * @author ron
@@ -31,7 +30,6 @@ public class SquareMatrix extends Matrix {
     //that assert(expression) is not as meaninful to the java compiler/runtime as 
     //it is in c/c++ => i'm using an unchecked exception, because I *really*
     //don't want client code to continue execution after that exception is thrown
-
     public SquareMatrix() {
         super();
         if (rows != columns) {
@@ -168,59 +166,91 @@ public class SquareMatrix extends Matrix {
 
         return result;
     }
-    
-    public double[] eigenvalues () {
+
+    public double[] eigenvalues() {
         return eigenvalues(this);
     }
-    
-    public static double [] eigenvalues (SquareMatrix A) {
+
+    public static double[] eigenvalues(SquareMatrix A) {
         double[] e = new double[A.getRows()];
-        
+
         QRDecomposition qr = new QRDecomposition();
         qr.iterations = 0;
-        
+        int num_eigen_found = 0;
         SquareMatrix QRIterator = A;
-        
+
         do {
             qr.decompose(QRIterator);
             try {
                 QRIterator = new SquareMatrix(qr.R.mult(qr.Q));
-                 
+
             } catch (DimensionMismatchException ex) {
                 System.out.println("An unexpected exception occurred during QRIterator = R*Q, bailing.");
                 System.exit(-1);
             }
             qr.iterations++;
             
-        }while (hasConverged(QRIterator) == false && qr.iterations < 100000);
-        
-        if(hasConverged(QRIterator)) {
-            for(int i = 0; i < e.length; ++i) {
+            
+            //testing indicates that MAX_ITERATIONS iterations should be more than sufficient to converge, if its going to at all
+            if(qr.iterations >= MAX_ITERATIONS) {
+                if(Math.abs(QRIterator.getMatrix()[QRIterator.getRows()-1][QRIterator.getColumns()-2]) < CONVERGENCE_CHECK) {
+                    //then the value at M[n][n] is an eigenvalue
+                    e[num_eigen_found] = QRIterator.getMatrix()[QRIterator.getRows()-1][QRIterator.getRows()-1];
+                    num_eigen_found++;
+                    
+                    double[][] deflatedMatrix = deflate(A.getMatrix(), 1);
+                    SquareMatrix Deflated = new SquareMatrix(deflatedMatrix);
+                    double[] temp = eigenvalues(Deflated);
+                    for(int i = num_eigen_found; i < e.length; ++i) {
+                        e[i] = temp[i-1];
+                        num_eigen_found++;
+                        //System.out.println("i:" + i + "e[i]" + e[i]);
+                    }
+                    return e;
+                }
+                else {
+                    //this is a 2x2 matrix with either real or complex roots.  need to find them.
+                }
+            }
+            
+        } while (hasConverged(QRIterator) == false && qr.iterations < MAX_ITERATIONS);
+
+        if (hasConverged(QRIterator)) {
+            for (int i = 0; i < e.length; ++i) {
                 e[i] = QRIterator.getMatrix()[i][i];
             }
         }
         //used for debugging here
-        /*System.out.println("Finished iterating.  Iterations:\t" + qr.iterations + 
-                "\nFinal value of qr.Q:\n" + qr.Q + "\nFinal value of qr.R:\n" + qr.R 
-                + "\nFinal value of QRIterator:\n" + QRIterator 
+        System.out.println("Finished iterating.  Iterations:\t" + qr.iterations
+                + "\nFinal value of qr.Q:\n" + qr.Q + "\nFinal value of qr.R:\n" + qr.R
+                + "\nFinal value of QRIterator:\n" + QRIterator
                 + "\nOriginal SquareMatrix A:\n" + A);
-        */
+
         return e;
     }
+
     //internal helper method called from eigenvalues function 
     private static boolean hasConverged(SquareMatrix A) {
         double[][] a = A.getMatrix().clone();//do not want to modify it here
-        
+
         for (int i = 0; i < a.length; ++i) {
-            for (int j = 0; j < a[0].length; ++j) {
-                if(i > j) {
-                    if (MatrixConstants.CONVERGENCE_CHECK < Math.abs(a[i][j])) {
-                        return false;
-                    }
+            for (int j = i - 1; j >= 0; --j) {
+                if (MatrixConstants.CONVERGENCE_CHECK < Math.abs(a[i][j])) {
+                    return false;
                 }
             }
         }
-        
         return true;
+    }
+    
+    private static double[][] deflate (double[][] matrix, int numToDelete) {
+        double[][] deflated = new double[matrix.length-numToDelete][matrix[0].length-numToDelete];
+        
+        for (int i = 0; i < deflated.length; ++i) {
+            for (int j = 0; j < deflated[0].length; ++j) {
+                deflated[i][j] = matrix[i][j];
+            }
+        }
+        return deflated;
     }
 }

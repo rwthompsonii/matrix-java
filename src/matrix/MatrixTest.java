@@ -16,6 +16,8 @@
  */
 package matrix;
 
+import org.apache.commons.math3.complex.Complex;
+
 /**
  *
  * @author ron
@@ -155,10 +157,10 @@ public class MatrixTest {
         System.out.println("Performing basic check of QR Decomp with known 3x5 matrix.\n");
         
         double[][] qrTest = {
-            {4, 2, 2, 2},
-            {2, -3, 1, 1},
-            {2, 1, 3, 1},
-            {3, 1, 1, 2}};
+            {3, 2, 2, 1},
+            {-2, 3, 1, 1},
+            {2, 1, 2, 1},
+            {1, 1, 1, -1}};
 
         Matrix QRTest = new Matrix(qrTest);
 
