@@ -187,7 +187,7 @@ public class MatrixTest {
         System.out.println("Beginning initial testing of eigenvalue function on QRTest:\n" + QRTest);
 
         double[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
-        
+        Complex eigen2 = new Complex(1, 1);//just making sure the library works
         for (double e : eigen) {
             System.out.println("eigenvalue:" + e);
         }
