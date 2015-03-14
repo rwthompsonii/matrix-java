@@ -153,9 +153,8 @@ public class MatrixTest {
         System.out.println("smoke checking determinant method with " + BMFsize + "x" + BMFsize + " matrix.\n");
         System.out.println("Result of big3.determinant():\t" + big3.determinant() + "\n");
 
-        
         System.out.println("Performing basic check of QR Decomp with known 3x5 matrix.\n");
-        
+
         double[][] qrTest = {
             {4, 8, 9, 1},
             {2, -3, 1, -1},
@@ -167,9 +166,9 @@ public class MatrixTest {
         QRDecomposition qr = new QRDecomposition();
 
         qr.decompose(QRTest);
-        
+
         System.out.println("\nQ:\n" + qr.Q + "\nR:\n" + qr.R + "\nQRtest: (original matrix)\n" + QRTest);
-        
+
         try {
             System.out.println("Result of Q.mult(R): (should be the original matrix)\n" + qr.Q.mult(qr.R));
         } catch (DimensionMismatchException ex) {
@@ -184,25 +183,30 @@ public class MatrixTest {
             System.exit(-1);
         }
 
-        System.out.println("Beginning initial testing of eigenvalue function on QRTest:\n" + QRTest);
+        /*System.out.println("Beginning initial testing of eigenvalue function on QRTest:\n" + QRTest);
 
-        Complex[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
-        
-        for (Complex e : eigen) {
-            System.out.println("eigenvalue:" + e);
-        }
-        
-        int SMFSize = 4;
+         Complex[] eigen = SquareMatrix.eigenvalues(new SquareMatrix(QRTest));
+
+         for (Complex e : eigen) {
+         System.out.println("eigenvalue:" + e);
+         }*/
+        int SMFSize = 20;
         SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
-        
-        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4.toCopyableString());
-        eigen = big4.eigenvalues();
-        
-        for (Complex e : eigen) {
+         /*this matrix is causing a bug, using it to troubleshooot
+         double[][] big4Matrix = {
+         {-2.476, -2.814, 4.29, -3.649}, 
+         {2.839, -2.859, 1.623, -2.926}, 
+         {-0.392, -3.206, -0.401, -2.174}, 
+         {2.241, -4.435, -3.963, 4.102}};
+         SquareMatrix big4 = new SquareMatrix(big4Matrix);
+         */
+        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize /*+ " matrix:\n" + big4*/);
+        Complex eigen2[] = big4.eigenvalues();
+
+        for (Complex e : eigen2) {
             System.out.println("eigenvalue:" + e);
         }
-        
-        
+
     }
 
 }

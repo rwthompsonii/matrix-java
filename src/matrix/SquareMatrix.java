@@ -190,6 +190,7 @@ public class SquareMatrix extends Matrix {
                 break;
             } else {
             qr.decompose(QRIterator); 
+            
             }
             try {
                 QRIterator = new SquareMatrix(qr.R.mult(qr.Q));
@@ -201,7 +202,8 @@ public class SquareMatrix extends Matrix {
             qr.iterations++;
 
             //testing indicates that MAX_ITERATIONS iterations should be more than sufficient to converge, if its going to at all
-            if (qr.iterations == max) {
+            if (qr.iterations == max  || Math.abs(QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 2]) < CONVERGENCE_CHECK) {
+                //System.out.println("QRIterator:\n" + QRIterator);
                 if (Math.abs(QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 2]) < CONVERGENCE_CHECK) {
                     //then the value at M[n][n] is an eigenvalue and it is real
                     e[num_eigen_found] = new Complex(
@@ -226,6 +228,12 @@ public class SquareMatrix extends Matrix {
                                     QRIterator.getMatrix()[QRIterator.getRows() - 2][QRIterator.getColumns() - 2]
                             );
 
+                        }
+                        else if(QRIterator.getRows() == 1) {
+                            //i'm on the very last 1x1 submatrix and it contains the last eigenvalue
+                            e[num_eigen_found++] = new Complex(
+                                    QRIterator.getMatrix()[QRIterator.getRows() - 1][QRIterator.getColumns() - 1]
+                            );
                         }
 
                         break;
