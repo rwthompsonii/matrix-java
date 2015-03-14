@@ -53,9 +53,9 @@ public class QRDecomposition implements MatrixConstants {
         //that's two columns from the end 
         for (int k = 0; k < n - 2; ++k) {
             System.out.println("iteration #" + (k+1));
+            
             //move the kth column of h into v
             double[] v = new double[m - (k + 1)];
-
             //move the elements in the kth column
             //that I want zeroed into the v array
             for (int j = k + 1; j < m; ++j) {
@@ -72,7 +72,8 @@ public class QRDecomposition implements MatrixConstants {
 
             //scale the vector by its norm
             v = vector_scale(v, (1 / vector_norm(v)));
-
+            
+            
             Matrix V = new Matrix(v, ROW_VECTOR);
             Matrix Vt = new Matrix(v, COLUMN_VECTOR);
 
@@ -109,6 +110,7 @@ public class QRDecomposition implements MatrixConstants {
             for (int i = k + 2; i < m; ++i) {
                 h[i][k] = 0;
             }
+            
             temp = new double[m][n - (k + 1)];
 
             //construct another temp matrix 
@@ -119,8 +121,12 @@ public class QRDecomposition implements MatrixConstants {
             }
 
             B = new Matrix(temp);
+            //Matrix C = minor(new Matrix(h), 0, k+1);
+            
+            
+            
             try {
-                B = B.subtract(B.mult(Vt).mult(V).scale(2));
+                B = B.subtract((B.mult(Vt)).mult(V).scale(2));
             } catch (DimensionMismatchException ex) {
                 System.out.println("An unexpected exception occurred on second hessenberg lines.  Bailing");
                 System.exit(-1);
@@ -155,7 +161,7 @@ public class QRDecomposition implements MatrixConstants {
             double[] x = new double[A.getRows()];
             double a = 0.0;
 
-            z1 = minor(z, k);
+            z1 = minor(z, k, k);
             z = z1;
 
             //move the kth column of z into x;
@@ -248,14 +254,14 @@ public class QRDecomposition implements MatrixConstants {
      * @return - a Matrix populated with the identity matrix before A[row][row]
      * and data from the original matrix on/after
      */
-    private Matrix minor(Matrix A, int row) {
+    private Matrix minor(Matrix A, int row, int column) {
         double[][] result = new double[A.getRows()][A.getColumns()];
 
-        for (int i = 0; i < row; ++i) {
+        for (int i = 0; i <= row; ++i) {
             result[i][i] = 1;
         }
         for (int i = row; i < A.getRows(); ++i) {
-            for (int j = row; j < A.getColumns(); ++j) {
+            for (int j = column; j < A.getColumns(); ++j) {
                 result[i][j] = A.getMatrix()[i][j];
             }
         }
