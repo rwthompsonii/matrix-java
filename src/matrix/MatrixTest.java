@@ -207,7 +207,20 @@ public class MatrixTest {
         for (Complex e : eigen2) {
             System.out.println("eigenvalue #" + eig++ + ":\t" + Precision.round(e.getReal(), 3) + " + " + Precision.round(e.getImaginary(), 3) + "i");
         }
+        
+        double[] vector = new double[5];
+        double[] vector2 = new double[5];
+        
+        Matrix v1 = new Matrix(vector, MatrixConstants.ROW_VECTOR);
+        Matrix v2 = new Matrix(vector2, MatrixConstants.COLUMN_VECTOR);
+        
+        System.out.println("\nv1: (should be 1x5)\n" + v1 + "\nv2: (should be 5x1)\n" + v2);
 
+        System.out.println("Testing hessenberg() with big4:\n" + big4);
+        
+        System.out.println(qr.hessenberg(big4));
+        
+        System.out.println("\n" + big4.toCopyableString() + "\n");
     }
 
 }

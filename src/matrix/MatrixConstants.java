@@ -25,4 +25,6 @@ public interface MatrixConstants {
     int DEFAULT_SIZE = 2;
     double CONVERGENCE_CHECK = 0.000001;
     int MAX_ITERATIONS = 500;
+    boolean ROW_VECTOR = true;
+    boolean COLUMN_VECTOR = false;
 }

@@ -21,7 +21,7 @@ package matrix;
  *
  * @author Ron
  */
-public class QRDecomposition {
+public class QRDecomposition implements MatrixConstants {
 
     public Matrix Q;
     public Matrix R;
@@ -29,6 +29,116 @@ public class QRDecomposition {
 
     public QRDecomposition() {
 
+    }
+
+    public Matrix hessenberg(Matrix A) {
+
+        int m = A.getRows();
+        int n = A.getColumns();
+        
+        if (n <= 2) {
+            //deals with pathological cases
+            return A;
+        }
+
+        double[][] h = new double[m][n];
+        
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                h[i][j] = A.getMatrix()[i][j];
+            }
+        }
+
+        //first, we want to iterate over the columns of h from k = 0 to n-3
+        //that's two columns from the end 
+        for (int k = 0; k < n - 2; ++k) {
+            System.out.println("iteration #" + (k+1));
+            //move the kth column of h into v
+            double[] v = new double[m - (k + 1)];
+
+            //move the elements in the kth column
+            //that I want zeroed into the v array
+            for (int j = k + 1; j < m; ++j) {
+                v[j - (k + 1)] = h[j][k];
+            }
+            //calculate the norm
+            double alpha = -vector_norm(v);
+
+            //hack for the sign function over the basis vector
+            if (v[0] < 0) {
+                alpha *= -1;
+            }
+            v[0] -= alpha;
+
+            //scale the vector by its norm
+            v = vector_scale(v, (1 / vector_norm(v)));
+
+            Matrix V = new Matrix(v, ROW_VECTOR);
+            Matrix Vt = new Matrix(v, COLUMN_VECTOR);
+
+            //copy the submatrix into the temp matrix
+            double[][] temp = new double[m - (k + 1)][n - (k + 1)];
+            
+            for (int i = k + 1; i < m; ++i) {
+                for (int j = k + 1; j < n; ++j) {
+                    temp[i - (k + 1)][j - (k + 1)] = h[i][j];
+                }
+            }
+
+            Matrix B = new Matrix(temp);
+            //temp = temp - 2 * Vt * (V * temp)
+            try {
+                B = B.subtract(Vt.scale(2).mult(V.mult(B)));
+            } catch (DimensionMismatchException ex) {
+                ex.printStackTrace(System.out);
+                System.out.println("An unexpected exception occurred on first hessenberg line.  Bailing");
+                System.exit(-1);
+            }
+
+            temp = B.getMatrix();
+
+            //put it back in h, just reverse the assignment from before
+            for (int i = k + 1; i < m; ++i) {
+                for (int j = k + 1; j < n; ++j) {
+                    h[i][j] = temp[i - (k + 1)][j - (k + 1)];
+                }
+            }
+
+            //fixing roundoff errors from multiplication
+            h[k + 1][k] = alpha;
+            for (int i = k + 2; i < m; ++i) {
+                h[i][k] = 0;
+            }
+            temp = new double[m][n - (k + 1)];
+
+            //construct another temp matrix 
+            for (int i = 0; i < m; ++i) {
+                for (int j = k + 1; j < n; ++j) {
+                    temp[i][j - (k + 1)] = h[i][j];
+                }
+            }
+
+            B = new Matrix(temp);
+            try {
+                B = B.subtract(B.mult(Vt).mult(V).scale(2));
+            } catch (DimensionMismatchException ex) {
+                System.out.println("An unexpected exception occurred on second hessenberg lines.  Bailing");
+                System.exit(-1);
+            }
+            
+            temp = B.getMatrix();
+            
+            //put temp back into h and start the loop back over
+            
+            for (int i = 0; i < m; ++i) {
+                for (int j = k + 1; j < n; ++j) {
+                    h[i][j] = temp[i][j - (k + 1)] ;
+                }
+            }
+            
+        }
+
+        return new Matrix(h);
     }
 
     public void decompose(Matrix A) {

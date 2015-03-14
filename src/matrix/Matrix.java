@@ -59,6 +59,24 @@ public class Matrix implements MatrixConstants {
         this.columns = matrix[0].length;
     }
 
+    public Matrix(double[] vector, boolean rowOrColumnVector) {
+        if (rowOrColumnVector) {
+            this.rows = 1;
+            this.columns = vector.length;
+            this.matrix = new double[rows][columns];
+            for (int j = 0; j < columns; ++j) {
+                matrix[0][j] = vector[j];
+            }
+        } else {
+            this.columns = 1;
+            this.rows = vector.length;
+            this.matrix = new double[rows][columns];
+            for(int i = 0; i < rows; ++i) {
+                matrix[i][0] = vector[i];
+            }
+        }
+    }
+
     /**
      * a convenience constructor provided for integer[][] inputs
      *
@@ -168,7 +186,7 @@ public class Matrix implements MatrixConstants {
         }
         return result.toString();
     }
-    
+
     public String toCopyableString() {
         StringBuilder result = new StringBuilder(rows * columns * 3);
         result.append("{");
@@ -176,12 +194,12 @@ public class Matrix implements MatrixConstants {
             result.append("{");
             for (int j = 0; j < columns; ++j) {
                 result.append(Precision.round(matrix[i][j], 3));
-                if(j < columns-1) {
+                if (j < columns - 1) {
                     result.append(",");
                 }
             }
             result.append("}");
-            if(i < rows-1) {
+            if (i < rows - 1) {
                 result.append(",");
             }
         }
@@ -211,7 +229,7 @@ public class Matrix implements MatrixConstants {
 
         return Matrix.mult(A, B).getMatrix();
     }
-    
+
     public Matrix mult(Matrix B) throws DimensionMismatchException {
         return mult(this, B);
     }
@@ -286,7 +304,7 @@ public class Matrix implements MatrixConstants {
             throw new DimensionMismatchException("This operation can only be performed on matrices of equal dimensions.");
         }
 
-        double[][] result = new double[A.getRows()][A.getColumns()]; 
+        double[][] result = new double[A.getRows()][A.getColumns()];
 
         for (int i = 0; i < A.getRows(); ++i) {
             for (int j = 0; j < A.getColumns(); ++j) {
@@ -320,16 +338,16 @@ public class Matrix implements MatrixConstants {
         }
         return new Matrix(zeroMatrix);
     }
-    
-    public static Matrix random (int rows, int columns, double max, double min) {
+
+    public static Matrix random(int rows, int columns, double max, double min) {
         double[][] randomMatrix = new double[rows][columns];
-        
-        for(int i = 0; i < rows; ++i) {
+
+        for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
-                randomMatrix[i][j] =  (Math.random() * (max - min) + min);
+                randomMatrix[i][j] = (Math.random() * (max - min) + min);
             }
         }
-        
+
         return new Matrix(randomMatrix);
-    } 
+    }
 }
