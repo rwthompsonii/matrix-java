@@ -17,6 +17,7 @@
 package matrix;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.util.Precision;
 
 /**
  *
@@ -153,7 +154,7 @@ public class MatrixTest {
         System.out.println("smoke checking determinant method with " + BMFsize + "x" + BMFsize + " matrix.\n");
         System.out.println("Result of big3.determinant():\t" + big3.determinant() + "\n");
 
-        System.out.println("Performing basic check of QR Decomp with known 3x5 matrix.\n");
+        System.out.println("Performing basic check of QR Decomp with known 4x4 matrix.\n");
 
         double[][] qrTest = {
             {4, 8, 9, 1},
@@ -190,9 +191,9 @@ public class MatrixTest {
          for (Complex e : eigen) {
          System.out.println("eigenvalue:" + e);
          }*/
-        int SMFSize = 20;
+        int SMFSize = 4;
         SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
-         /*this matrix is causing a bug, using it to troubleshooot
+        /*this matrix is causing a bug, using it to troubleshooot
          double[][] big4Matrix = {
          {-2.476, -2.814, 4.29, -3.649}, 
          {2.839, -2.859, 1.623, -2.926}, 
@@ -200,11 +201,11 @@ public class MatrixTest {
          {2.241, -4.435, -3.963, 4.102}};
          SquareMatrix big4 = new SquareMatrix(big4Matrix);
          */
-        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize /*+ " matrix:\n" + big4*/);
+        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4);
         Complex eigen2[] = big4.eigenvalues();
-
+        int eig = 1;
         for (Complex e : eigen2) {
-            System.out.println("eigenvalue:" + e);
+            System.out.println("eigenvalue #" + eig++ + ":\t" + Precision.round(e.getReal(), 3) + " + " + Precision.round(e.getImaginary(), 3) + "i");
         }
 
     }
