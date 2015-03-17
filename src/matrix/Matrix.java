@@ -115,15 +115,13 @@ public class Matrix implements MatrixConstants {
         }
         this.matrix = convertedMatrix;
     }
-
-    public static Matrix IdentityMatrix(int size) {
-        assert (size > 1);
-
-        double[][] identity = new double[size][size];
+    
+    public static Matrix IdentityMatrix(int rows, int columns) {
+        double[][] identity = new double[rows][columns];
 
         //cannot use Arrays.fill on multidimensional arrays.... 
-        for (int i = 0; i < size; ++i) {
-            for (int j = 0; j < size; ++j) {
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
                 if (i == j) {
                     identity[i][j] = 1;
                 } else {
@@ -135,6 +133,10 @@ public class Matrix implements MatrixConstants {
         Matrix Identity = new Matrix(identity);
 
         return Identity;
+    }
+
+    public static Matrix IdentityMatrix(int size) {
+        return IdentityMatrix(size,size);
     }
 
     //note that equals does NOT compare with equality operator, it uses MatrixConstants.EPSILON for "close enough"

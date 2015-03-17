@@ -216,11 +216,19 @@ public class MatrixTest {
         
         System.out.println("\nv1: (should be 1x5)\n" + v1 + "\nv2: (should be 5x1)\n" + v2);
 
-        System.out.println("Testing hessenberg() with QRTest:\n" + QRTest);
+        double[][] qrTest2 = {
+            {4, 2, 2, 1},
+            {2, -3, 1, 1},
+            {2, 1, 3, 1},
+            {1, 1, 1, 2}};
+
+        Matrix QRTest2 = new Matrix(qrTest2);
         
-        System.out.println(qr.hessenberg(QRTest));
+        System.out.println("Testing hessenberg() with QRTest:\n" + QRTest2);
         
-        System.out.println("\n" + QRTest.toCopyableString() + "\n");
+        System.out.println(qr.hessenberg(QRTest2));
+        
+        System.out.println("\n" + QRTest2.toCopyableString() + "\n");
     }
 
 }
