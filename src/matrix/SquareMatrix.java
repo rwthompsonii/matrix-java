@@ -174,8 +174,14 @@ public class SquareMatrix extends Matrix {
 
     public static Complex[] eigenvalues(SquareMatrix A) {
         Complex[] e = new Complex[A.getRows()];
-
+        
         QRDecomposition qr = new QRDecomposition();
+        
+        //in general, QR decomposition will converge faster from an upper
+        //Hessenberg matrix.  so, first things first, we bring A to that form
+        
+        A = new SquareMatrix(qr.hessenberg(A));
+        
         qr.iterations = 0;
         int num_eigen_found = 0;
         SquareMatrix QRIterator = A;

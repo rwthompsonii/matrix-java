@@ -24,7 +24,7 @@ public interface MatrixConstants {
     double EPSILON = 0.0000001;
     int DEFAULT_SIZE = 2;
     double CONVERGENCE_CHECK = 0.000001;
-    int MAX_ITERATIONS = 500;
+    int MAX_ITERATIONS = 300;
     boolean ROW_VECTOR = true;
     boolean COLUMN_VECTOR = false;
 }

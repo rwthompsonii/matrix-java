@@ -191,29 +191,34 @@ public class MatrixTest {
          for (Complex e : eigen) {
          System.out.println("eigenvalue:" + e);
          }*/
-        int SMFSize = 4;
+        int SMFSize = 10;
+
         SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
         /*this matrix is causing a bug, using it to troubleshooot
          double[][] big4Matrix = {
-         {-2.476, -2.814, 4.29, -3.649}, 
-         {2.839, -2.859, 1.623, -2.926}, 
-         {-0.392, -3.206, -0.401, -2.174}, 
+         {-2.476, -2.814, 4.29, -3.649},
+         {2.839, -2.859, 1.623, -2.926},
+         {-0.392, -3.206, -0.401, -2.174},
          {2.241, -4.435, -3.963, 4.102}};
          SquareMatrix big4 = new SquareMatrix(big4Matrix);
          */
-        System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4);
+        if (SMFSize < 6) {
+            System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4);
+        }//only print it if it will fit on the screen
         Complex eigen2[] = big4.eigenvalues();
+
+        //System.out.println(big4.toCopyableString());//used for debugging
         int eig = 1;
         for (Complex e : eigen2) {
             System.out.println("eigenvalue #" + eig++ + ":\t" + Precision.round(e.getReal(), 3) + " + " + Precision.round(e.getImaginary(), 3) + "i");
         }
-        
+
         double[] vector = new double[5];
         double[] vector2 = new double[5];
-        
+
         Matrix v1 = new Matrix(vector, MatrixConstants.ROW_VECTOR);
         Matrix v2 = new Matrix(vector2, MatrixConstants.COLUMN_VECTOR);
-        
+
         System.out.println("\nv1: (should be 1x5)\n" + v1 + "\nv2: (should be 5x1)\n" + v2);
 
         double[][] qrTest2 = {
@@ -223,12 +228,19 @@ public class MatrixTest {
             {1, 1, 1, 2}};
 
         Matrix QRTest2 = new Matrix(qrTest2);
-        
-        System.out.println("Testing hessenberg() with QRTest:\n" + QRTest2);
-        
-        System.out.println(qr.hessenberg(QRTest2));
-        
-        System.out.println("\n" + QRTest2.toCopyableString() + "\n");
+
+        System.out.println("Testing hessenberg() with QRTest2:\n" + QRTest2);
+
+        System.out.println("Hessenberg output for QRTest2:\n" + qr.hessenberg(QRTest2));
+
+        int big6size = 5;
+        SquareMatrix big6 = new SquareMatrix(Matrix.random(big6size, big6size, -5, 5));
+
+        System.out.println("Testing hessenberg() with big6:\n" + big6);
+
+        System.out.println("Hessenberg output with big6:\n" + qr.hessenberg(big6));
+
+        //System.out.println(big6.toCopyableString());
     }
 
 }
