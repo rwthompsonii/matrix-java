@@ -193,15 +193,15 @@ public class MatrixTest {
          }*/
         int SMFSize = 10;
 
-        SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
-        /*this matrix is causing a bug, using it to troubleshooot
-         double[][] big4Matrix = {
-         {-2.476, -2.814, 4.29, -3.649},
-         {2.839, -2.859, 1.623, -2.926},
-         {-0.392, -3.206, -0.401, -2.174},
-         {2.241, -4.435, -3.963, 4.102}};
-         SquareMatrix big4 = new SquareMatrix(big4Matrix);
-         */
+        //SquareMatrix big4 = new SquareMatrix(Matrix.random(SMFSize, SMFSize, -5, 5));
+        //this matrix is causing a bug, using it to troubleshooot
+        double[][] big4Matrix = {
+            {-2.476, -2.814, 4.29, -3.649},
+            {2.839, -2.859, 1.623, -2.926},
+            {-0.392, -3.206, -0.401, -2.174},
+            {2.241, -4.435, -3.963, 4.102}};
+        SquareMatrix big4 = new SquareMatrix(big4Matrix);
+
         if (SMFSize < 6) {
             System.out.println("Smoke test of eigenvalue function with " + SMFSize + "x" + SMFSize + " matrix:\n" + big4);
         }//only print it if it will fit on the screen

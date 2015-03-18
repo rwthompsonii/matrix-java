@@ -23,8 +23,8 @@ package matrix;
 public interface MatrixConstants {
     double EPSILON = 0.0000001;
     int DEFAULT_SIZE = 2;
-    double CONVERGENCE_CHECK = 0.000001;
-    int MAX_ITERATIONS = 300;
+    double CONVERGENCE_CHECK = 1E-6;
+    int MAX_ITERATIONS = 500;
     boolean ROW_VECTOR = true;
     boolean COLUMN_VECTOR = false;
 }

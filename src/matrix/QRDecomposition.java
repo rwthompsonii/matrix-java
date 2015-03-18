@@ -60,7 +60,8 @@ public class QRDecomposition implements MatrixConstants {
             //move the kth column of h into v
             double[] v = new double[m];
 
-            //move the elements in the kth column tot the v vector            
+            //move the elements below the main diagonal in the kth column 
+            //of matrix 'h' to the 'v'vector            
             for (int j = k + 1; j < m; ++j) {
                 v[j] = h[j][k];
             }
@@ -98,6 +99,12 @@ public class QRDecomposition implements MatrixConstants {
             }
 
             h = B.getMatrix();
+            
+            //h[k+1][k] = alpha;
+            //fix rounding errors implicit in floating point calcs
+            for(int i = k+2; i < m; ++i) {
+                h[i][k] = 0;
+            }
         }//end for
         return new Matrix(h);
     }//end hessenberg
